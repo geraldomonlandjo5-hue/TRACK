@@ -1,6 +1,9 @@
-/target/
+﻿/target/
+/build/
+/dist/
+/nbproject/private/
+/.idea/
 *.log
-.idea/
-.nb-gradle/
-.DS_Store
 .env
+.env.*
+!.env.example
