@@ -42,4 +42,7 @@ done
 # Tester le datasource
 "$WILDFLY/bin/jboss-cli.sh" --connect --command="/subsystem=datasources/data-source=TrackDS:test-connection-in-pool"
 
+# Déployer TRACK seulement après configuration et test de PostgreSQL
+cp "$WILDFLY/track.war" "$WILDFLY/standalone/deployments/track.war"
+
 wait "$WILDFLY_PID"
