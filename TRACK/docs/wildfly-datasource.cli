@@ -1,0 +1,5 @@
+# Exemple indicatif : installer d'abord le driver PostgreSQL comme module WildFly.
+# Le nom du module doit correspondre au module installé (ici org.postgresql).
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver)
+/subsystem=datasources/data-source=TrackDS:add(jndi-name=java:/jdbc/TrackDS,driver-name=postgresql,connection-url=jdbc:postgresql://localhost:5432/track_db,user-name=track_user,password=CHANGER_CE_MOT_DE_PASSE,jta=false,enabled=true,min-pool-size=2,max-pool-size=20,validate-on-match=true,background-validation=false)
+:reload

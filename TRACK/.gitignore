@@ -1,0 +1,8 @@
+/target/
+*.log
+.idea/
+.nb-gradle/
+.DS_Store
+.env
+*.war
+nbproject/private/

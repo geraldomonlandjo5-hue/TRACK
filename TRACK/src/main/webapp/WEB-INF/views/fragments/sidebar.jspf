@@ -1,0 +1,38 @@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%
+    String navUri = (String) request.getAttribute("jakarta.servlet.forward.request_uri");
+    if (navUri == null) navUri = request.getRequestURI();
+    String navCtx = request.getContextPath();
+    String navPath = navUri.startsWith(navCtx) ? navUri.substring(navCtx.length()) : navUri;
+    boolean navDash = navPath.startsWith("/dashboard");
+    boolean navShip = navPath.startsWith("/shipments");
+    boolean navTrack = navPath.startsWith("/track");
+%>
+<aside class="sidebar">
+    <a class="brand" href="${pageContext.request.contextPath}/dashboard">
+        <span class="brand-mark">T</span><span>TRACK</span>
+    </a>
+    <nav aria-label="Navigation principale">
+        <a class="nav-link-track<%= navDash ? " is-active" : "" %>" <%= navDash ? "aria-current=\"page\"" : "" %> href="${pageContext.request.contextPath}/dashboard">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            Tableau de bord
+        </a>
+        <a class="nav-link-track<%= navShip ? " is-active" : "" %>" <%= navShip ? "aria-current=\"page\"" : "" %> href="${pageContext.request.contextPath}/shipments">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
+            Gestion des colis
+        </a>
+        <a class="nav-link-track<%= navTrack ? " is-active" : "" %>" <%= navTrack ? "aria-current=\"page\"" : "" %> href="${pageContext.request.contextPath}/track">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            Suivi public
+        </a>
+    </nav>
+    <div class="sidebar-bottom">
+        <form method="post" action="${pageContext.request.contextPath}/logout">
+            <input type="hidden" name="csrfToken" value="<c:out value='${sessionScope.csrfToken}'/>">
+            <button type="submit" class="nav-link-track">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>
+                Déconnexion
+            </button>
+        </form>
+    </div>
+</aside>
