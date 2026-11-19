@@ -1,0 +1,11 @@
+﻿.git
+.gitignore
+**/target
+**/build
+**/dist
+.env
+.env.*
+!.env.example
+.idea
+nbproject
+*.log
