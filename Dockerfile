@@ -1,6 +1,3 @@
-﻿# ==========================================
-# ETAPE 1 : Compilation Maven avec Java 21
-# ==========================================
 FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
@@ -10,46 +7,32 @@ COPY TRACK/src ./src
 
 RUN mvn clean package -DskipTests
 
-RUN mvn dependency:copy `
-    -Dartifact=org.postgresql:postgresql:42.7.7 `
-    -DoutputDirectory=/tmp/postgresql
+RUN mkdir -p /tmp/postgresql && mvn dependency:copy -Dartifact=org.postgresql:postgresql:42.7.7 -DoutputDirectory=/tmp/postgresql
 
-# ==========================================
-# ETAPE 2 : Serveur WildFly 42
-# ==========================================
 FROM quay.io/wildfly/wildfly:42.0.0.Final-jdk21
 
 USER root
 
-# Installer le pilote PostgreSQL dans WildFly
 RUN mkdir -p /opt/jboss/wildfly/modules/org/postgresql/main
 
-COPY --from=build /tmp/postgresql/postgresql-42.7.7.jar \
-    /opt/jboss/wildfly/modules/org/postgresql/main/postgresql.jar
+COPY --from=build /tmp/postgresql/postgresql-42.7.7.jar /opt/jboss/wildfly/modules/org/postgresql/main/postgresql.jar
 
 RUN printf '%s\n' \
-    '<?xml version="1.0" encoding="UTF-8"?>' \
-    '<module xmlns="urn:jboss:module:1.9" name="org.postgresql">' \
-    '  <resources>' \
-    '    <resource-root path="postgresql.jar"/>' \
-    '  </resources>' \
-    '  <dependencies>' \
-    '    <module name="jakarta.api"/>' \
-    '    <module name="javax.api"/>' \
-    '    <module name="java.sql"/>' \
-    '  </dependencies>' \
-    '</module>' \
-    > /opt/jboss/wildfly/modules/org/postgresql/main/module.xml
+'<?xml version="1.0" encoding="UTF-8"?>' \
+'<module xmlns="urn:jboss:module:1.9" name="org.postgresql">' \
+'<resources><resource-root path="postgresql.jar"/></resources>' \
+'<dependencies><module name="jakarta.api"/><module name="javax.api"/><module name="java.sql"/></dependencies>' \
+'</module>' \
+> /opt/jboss/wildfly/modules/org/postgresql/main/module.xml
 
-COPY --from=build /app/target/track.war \
-    /opt/jboss/wildfly/standalone/deployments/track.war
+COPY --from=build /app/target/track.war /opt/jboss/wildfly/standalone/deployments/track.war
 
 COPY docker-entrypoint.sh /opt/jboss/wildfly/docker-entrypoint.sh
 
-RUN chmod +x /opt/jboss/wildfly/docker-entrypoint.sh \
-    && chown -R jboss:root /opt/jboss/wildfly/modules/org/postgresql \
-    /opt/jboss/wildfly/standalone/deployments \
-    /opt/jboss/wildfly/docker-entrypoint.sh
+RUN sed -i '1s/^\xEF\xBB\xBF//' /opt/jboss/wildfly/docker-entrypoint.sh \
+    && sed -i 's/\r$//' /opt/jboss/wildfly/docker-entrypoint.sh \
+    && chmod +x /opt/jboss/wildfly/docker-entrypoint.sh \
+    && chown -R jboss:root /opt/jboss/wildfly/modules/org/postgresql /opt/jboss/wildfly/standalone/deployments /opt/jboss/wildfly/docker-entrypoint.sh
 
 USER jboss
 
