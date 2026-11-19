@@ -25,7 +25,7 @@ RUN printf '%s\n' \
 '</module>' \
 > /opt/jboss/wildfly/modules/org/postgresql/main/module.xml
 
-COPY --from=build /app/target/track.war /opt/jboss/wildfly/standalone/deployments/track.war
+COPY --from=build /app/target/track.war /opt/jboss/wildfly/track.war
 
 COPY docker-entrypoint.sh /opt/jboss/wildfly/docker-entrypoint.sh
 
